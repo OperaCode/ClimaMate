@@ -6,6 +6,11 @@ import { Sun, Moon, CloudRain, Cloud, Wind } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ClipLoader } from "react-spinners";
 
+const apiKey = import.meta.env.VITE_WEATHER_API_KEY;
+
+
+
+// generate suggestion based on weather
 const getSuggestion = (temp, desc) => {
   if (!temp || !desc) return "";
   if (desc.includes("rain")) return "Carry an umbrella today 🌧️";
@@ -14,6 +19,7 @@ const getSuggestion = (temp, desc) => {
   return "Weather looks great for your day! 😊";
 };
 
+// greetings on weather
 const getGreeting = () => {
   const hour = new Date().getHours();
   if (hour < 12) return "Good morning";
@@ -37,8 +43,8 @@ const Home = () => {
     "Snowflakes can take up to an hour to reach the ground.",
   ];
 
-  const apiKey = import.meta.env.VITE_WEATHER_API_KEY;
-
+ 
+// To fetch current weather for user
   useEffect(() => {
     const fetchCurrentWeather = async () => {
       try {
@@ -61,6 +67,8 @@ const Home = () => {
     fetchCurrentWeather();
   }, [apiKey]);
 
+
+  // Helper function- weather facts
   useEffect(() => {
     const interval = setInterval(() => {
       setTriviaIndex((prev) => (prev + 1) % weatherFacts.length);
@@ -68,6 +76,8 @@ const Home = () => {
     return () => clearInterval(interval);
   }, []);
 
+
+  // fetch weather from search
   const fetchWeather = async (e) => {
     e.preventDefault();
     if (!city) {
@@ -94,6 +104,8 @@ const Home = () => {
     }
   };
 
+
+  // UI/UX weather Icon
   const getWeatherIcon = (main) => {
     if (!main) return <Wind size={48} className="text-gray-400" />;
     const w = main.toLowerCase();
@@ -104,6 +116,7 @@ const Home = () => {
     return <Wind size={48} className="text-gray-400" />;
   };
 
+  // Weather Recommendations
   const getEventSuggestion = (temp, desc) => {
     if (!temp || !desc) return "No suggestion";
     if (desc.includes("rain")) return "Consider indoor activities today.";
@@ -126,12 +139,12 @@ const Home = () => {
           <Sun size={24} className="text-yellow-300 animate-spin-slow" /> ClimaMate
         </h1>
         <div className="flex gap-4">
-          <button onClick={() => setDarkMode(!darkMode)} aria-label="Toggle dark mode">
+          <button className="cursor-pointer" onClick={() => setDarkMode(!darkMode)} >
             {darkMode ? <Sun size={24} /> : <Moon size={24} />}
           </button>
           <Link to="/">
-            <button className="font-medium px-4 py-2 rounded-lg hover:bg-white/20 transition duration-300" aria-label="Back to Landing Page">
-              Home
+            <button className="font-medium px-4 py-2 cursor-pointer rounded-lg hover:bg-white/20 transition duration-300" >
+              Exit
             </button>
           </Link>
         </div>
@@ -146,7 +159,7 @@ const Home = () => {
         >
           Check your weather instantly
         </motion.h2>
-        <p className="text-lg mb-6">{getGreeting()}, welcome to ClimaMate 👋</p>
+        <p className="text-lg mb-6">{getGreeting()}, Welcome to ClimaMate 👋</p>
 
         <section className="flex flex-col lg:flex-row w-full gap-6 justify-center items-start">
           {/* Current Weather Card */}
@@ -155,7 +168,7 @@ const Home = () => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.6 }}
-              className="bg-white/90 backdrop-blur-md rounded-xl shadow-xl p-6 w-full lg:w-2/3 flex-1"
+              className="bg-white/90 backdrop-blur-md rounded-xl  shadow-xl p-6 w-full lg:w-2/3 flex-1"
             >
               <h3 className="text-xl font-bold mb-4">
                 Current Weather ({currentWeather.name})
@@ -182,7 +195,7 @@ const Home = () => {
 
               {/* Forecast */}
               {forecast && (
-                <div className="mt-6">
+                <div className="mt-6 ">
                   <h3 className="text-lg font-bold mb-2">
                     Upcoming Forecast & Event Suggestions
                   </h3>
@@ -232,14 +245,14 @@ const Home = () => {
                 placeholder="Enter city name e.g. Lagos"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                className="flex-1 px-4 py-3 rounded-lg  border-2 border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                 aria-label="City name input"
               />
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-yellow-400 text-gray-800 font-semibold px-6 py-3 rounded-lg hover:bg-yellow-500 disabled:opacity-50 transition flex items-center justify-center gap-2"
-                aria-label="Search weather"
+                className=" cursor-pointer bg-yellow-400 text-gray-800 font-semibold px-6 py-3 rounded-lg hover:bg-yellow-500 disabled:opacity-50 transition flex items-center justify-center gap-2"
+                
               >
                 {loading && <ClipLoader size={20} color="#333" />}
                 <span>{loading ? "Searching..." : "Search"}</span>
@@ -252,7 +265,7 @@ const Home = () => {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6 }}
-                className="bg-white/90 backdrop-blur-md rounded-xl shadow-xl p-6 w-full mt-4"
+                className="bg-zinc-100 backdrop-blur-md rounded-xl shadow-xl p-6 w-full mt-4"
               >
                 <h3 className="text-xl font-bold mb-4">Searched Weather</h3>
                 <div className="flex justify-center mb-4">
@@ -278,11 +291,13 @@ const Home = () => {
         </section>
       </main>
 
+
+      {/* Footer */}
       <footer className="w-full py-4 px-6 text-center bg-white/10 backdrop-blur-md mt-auto z-10">
         <p className="text-sm">© 2025 ClimaMate. All rights reserved.</p>
       </footer>
 
-      {/* Trivia */}
+      {/* Trivia- Weather Facts */}
       <AnimatePresence mode="wait">
         <motion.div
           key={triviaIndex}

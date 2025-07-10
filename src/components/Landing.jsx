@@ -79,10 +79,6 @@ const LandingPage = () => {
     ? `https://openweathermap.org/img/wn/${weather.weather[0].icon}@4x.png`
     : "";
 
-  // const fadeInUp = {
-  //   hidden: { opacity: 0, y: 30 },
-  //   visible: { opacity: 1, y: 0 },
-  // };
 
   return (
     <div className={`w-full min-h-screen flex flex-col ${theme.bg} text-white`}>
@@ -94,16 +90,16 @@ const LandingPage = () => {
         </h1>
 
         {/* Nav Buttons */}
-        <nav className="flex gap-4">
+        <nav className="flex gap-4 ">
           {["#home", "#features", "#testimonials"].map((link, i) => (
             <a key={i} href={link}>
-              <button className="text-white px-4 py-2 rounded-full hover:bg-white/20 transition">
+              <button className=" hidden md:flex cursor-pointer text-white px-4 py-2 rounded-full hover:bg-white/20 transition">
                 {link.replace("#", "").charAt(0).toUpperCase() + link.slice(2)}
               </button>
             </a>
           ))}
           <Link to="/homepage">
-            <button className="bg-yellow-400 text-gray-800 px-6 py-2 rounded-full font-semibold hover:bg-yellow-500 transition">
+            <button className="bg-yellow-400 cursor-pointer text-gray-800 md:px-6 md:py-2 p-2 rounded-full font-semibold hover:bg-yellow-500 transition">
               Get Weather
             </button>
           </Link>
@@ -153,7 +149,7 @@ const LandingPage = () => {
             initial={{ y: 30, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.6, delay: 1 }}
-            className="bg-yellow-400 text-gray-800 px-10 py-4 rounded-full font-semibold shadow-xl hover:bg-yellow-500 transition"
+            className="bg-yellow-400 cursor-pointer text-gray-800 px-10 py-4 rounded-full font-semibold shadow-xl hover:bg-yellow-500 transition"
           >
             Get Started
           </motion.button>
@@ -338,7 +334,7 @@ const LandingPage = () => {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="bg-yellow-400 text-gray-800 px-10 py-4 rounded-full font-semibold shadow-xl hover:bg-yellow-500 transition"
+            className="bg-yellow-400 cursor-pointer text-gray-800 px-10 py-4 rounded-full font-semibold shadow-xl hover:bg-yellow-500 transition"
           >
             Get Started Now
           </motion.button>
