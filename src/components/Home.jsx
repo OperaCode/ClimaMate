@@ -170,25 +170,25 @@ const Home = () => {
               transition={{ duration: 0.6 }}
               className="bg-white/90 backdrop-blur-md rounded-xl  shadow-xl p-6 w-full lg:w-2/3 flex-1"
             >
-              <h3 className="text-xl font-bold mb-4">
+              <h3 className="text-xl text-gray-700  font-bold mb-4">
                 Current Weather ({currentWeather.name})
               </h3>
               <div className="flex justify-center mb-4">
                 {getWeatherIcon(currentWeather.weather[0].main)}
               </div>
-              <h3 className="text-2xl font-semibold mb-2">
+              <h3 className="text-2xl text-gray-700 font-semibold mb-2">
                 {currentWeather.name}, {currentWeather.sys.country}
               </h3>
               <p className="text-5xl font-bold text-blue-600 mb-2">
                 {Math.round(currentWeather.main.temp)}°C
               </p>
-              <p className="text-lg capitalize mb-4">
+              <p className="text-lg text-gray-700 capitalize mb-4">
                 {currentWeather.weather[0].description}
               </p>
-              <p className="text-sm mb-2">
+              <p className="text-sm mb-2 text-gray-700 ">
                 💡 {getSuggestion(currentWeather.main.temp, currentWeather.weather[0].description)}
               </p>
-              <div className="flex justify-around text-sm mb-4">
+              <div className="flex text-gray-700 justify-around text-sm mb-4">
                 <p>Humidity: {currentWeather.main.humidity}%</p>
                 <p>Wind: {currentWeather.wind.speed} m/s</p>
               </div>
@@ -196,7 +196,7 @@ const Home = () => {
               {/* Forecast */}
               {forecast && (
                 <div className="mt-6 ">
-                  <h3 className="text-lg font-bold mb-2">
+                  <h3 className="text-lg text-gray-700  font-bold mb-2">
                     Upcoming Forecast & Event Suggestions
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto">
@@ -267,18 +267,18 @@ const Home = () => {
                 transition={{ duration: 0.6 }}
                 className="bg-zinc-100 backdrop-blur-md rounded-xl shadow-xl p-6 w-full mt-4"
               >
-                <h3 className="text-xl font-bold mb-4">Searched Weather</h3>
+                <h3 className="text-xl font-bold text-gray-700  mb-4">Searched Weather</h3>
                 <div className="flex justify-center mb-4">
                   {getWeatherIcon(weather.weather[0].main)}
                 </div>
-                <h3 className="text-2xl font-semibold mb-2">
+                <h3 className="text-gray-700 text-2xl font-semibold mb-2">
                   {weather.name}, {weather.sys.country}
                 </h3>
                 <p className="text-5xl font-bold text-blue-600 mb-2">
                   {Math.round(weather.main.temp)}°C
                 </p>
-                <p className="text-lg capitalize mb-4">{weather.weather[0].description}</p>
-                <p className="text-sm mb-2">
+                <p className="text-lg capitalize mb-4 text-gray-700 ">{weather.weather[0].description}</p>
+                <p className="text-sm mb-2 text-gray-700 ">
                   💡 {getSuggestion(weather.main.temp, weather.weather[0].description)}
                 </p>
                 <div className="flex justify-around text-sm">
