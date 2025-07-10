@@ -4,14 +4,6 @@ import axios from "axios";
 import { Sun, MapPin, Smartphone, CalendarCheck } from "lucide-react";
 import { motion } from "framer-motion";
 
-const getSuggestion = (temp, desc) => {
-  if (!temp || !desc) return "";
-  if (desc.includes("rain")) return "Don't forget your umbrella today!";
-  if (temp > 30) return "Stay hydrated, it's quite hot today.";
-  if (temp < 15) return "Wear a jacket, it's chilly.";
-  return "It's a great day to be productive!";
-};
-
 const weatherThemes = {
   Clear: { bg: "bg-gradient-to-br from-yellow-400 via-orange-300 to-blue-300" },
   Rain: { bg: "bg-gradient-to-br from-gray-600 via-blue-700 to-teal-600" },
@@ -24,6 +16,7 @@ const LandingPage = () => {
   const [currentFact, setCurrentFact] = useState("");
   const [greeting, setGreeting] = useState("");
 
+  // Weather Facts
   const weatherFacts = [
     "Raindrops can fall at speeds of about 22 mph.",
     "Lightning is five times hotter than the sun’s surface.",
@@ -33,6 +26,7 @@ const LandingPage = () => {
   ];
 
   const apiKey = import.meta.env.VITE_WEATHER_API_KEY;
+
   // fetch weather
   useEffect(() => {
     const fetchWeather = async () => {
@@ -77,16 +71,18 @@ const LandingPage = () => {
   }, []);
 
   const condition = weather?.weather[0].main;
-  console.log(condition)
+  // console.log(condition)
   const theme = weatherThemes[condition] || weatherThemes["default"];
+
+  // fetched weather icon
   const weatherIconUrl = weather
     ? `https://openweathermap.org/img/wn/${weather.weather[0].icon}@4x.png`
     : "";
 
-  const fadeInUp = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0 },
-  };
+  // const fadeInUp = {
+  //   hidden: { opacity: 0, y: 30 },
+  //   visible: { opacity: 1, y: 0 },
+  // };
 
   return (
     <div className={`w-full min-h-screen flex flex-col ${theme.bg} text-white`}>
@@ -96,15 +92,17 @@ const LandingPage = () => {
           <Sun size={28} className="text-yellow-400 animate-spin-slow" />{" "}
           ClimaMate
         </h1>
+
+        {/* Nav Buttons */}
         <nav className="flex gap-4">
-          {["#Home", "#features", "#testimonials"].map((link, i) => (
+          {["#home", "#features", "#testimonials"].map((link, i) => (
             <a key={i} href={link}>
               <button className="text-white px-4 py-2 rounded-full hover:bg-white/20 transition">
                 {link.replace("#", "").charAt(0).toUpperCase() + link.slice(2)}
               </button>
             </a>
           ))}
-          <Link to="/home">
+          <Link to="/homepage">
             <button className="bg-yellow-400 text-gray-800 px-6 py-2 rounded-full font-semibold hover:bg-yellow-500 transition">
               Get Weather
             </button>
@@ -112,16 +110,17 @@ const LandingPage = () => {
         </nav>
       </header>
 
-      {/* Hero */}
+      {/* Hero Section */}
       <motion.main
-        id="top"
+        id="home"
         initial={{ scale: 0 }}
         whileInView={{ scale: 1 }}
-        variants={fadeInUp}
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="flex flex-col items-center justify-center px-4 py-30 text-center space-y-6  scroll-mt-10 "
       >
         <p className="text-xl sm:text-2xl font-semibold">{greeting}</p>
+
+        {/* Weather Icon for Hero */}
         {weather && (
           <motion.img
             src={weatherIconUrl}
@@ -161,13 +160,12 @@ const LandingPage = () => {
         </Link>
       </motion.main>
 
-      {/* Features */}
+      {/* Features Section */}
       <motion.section
         id="features"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
-        variants={fadeInUp}
         transition={{ duration: 0.8 }}
         className="py-20 px-6 bg-white/10 backdrop-blur-md scroll-mt-8"
       >
@@ -179,6 +177,8 @@ const LandingPage = () => {
         >
           Features
         </motion.h2>
+
+        {/* Features Cards */}
         <div className="grid md:grid-cols-3 gap-10 max-w-5xl mx-auto text-center ">
           {[
             {
@@ -199,7 +199,6 @@ const LandingPage = () => {
           ].map((f, i) => (
             <motion.div
               key={i}
-              variants={fadeInUp}
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               transition={{ delay: 0.9, duration: 0.6 }}
@@ -211,13 +210,13 @@ const LandingPage = () => {
           ))}
         </div>
       </motion.section>
+
       {/* how it works */}
       <motion.section
         id="how-it-works"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
-        variants={fadeInUp}
         transition={{ duration: 0.8 }}
         className="py-20 px-6 bg-white/5 backdrop-blur-md scroll-mt-8"
       >
@@ -230,6 +229,7 @@ const LandingPage = () => {
           How It Works
         </motion.h2>
 
+        {/* How it works Cards */}
         <div className="max-w-4xl mx-auto grid md:grid-cols-3 gap-10 text-center">
           {[
             {
@@ -252,7 +252,6 @@ const LandingPage = () => {
           ].map((step, i) => (
             <motion.div
               key={i}
-              variants={fadeInUp}
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               transition={{ delay: 0.7 + i * 0.2, duration: 0.6 }}
@@ -265,13 +264,12 @@ const LandingPage = () => {
         </div>
       </motion.section>
 
-      {/* Testimonials */}
+      {/* Testimonials Section */}
       <motion.section
         id="testimonials"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
-        variants={fadeInUp}
         transition={{ duration: 1 }}
         className="py-20 px-6 bg-white/5 backdrop-blur-md scroll-mt-8"
       >
@@ -283,7 +281,7 @@ const LandingPage = () => {
         >
           What Users Say
         </motion.h2>
-
+        {/* Testimonial Cards */}
         <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8 text-center">
           {[
             {
@@ -318,18 +316,24 @@ const LandingPage = () => {
         </div>
       </motion.section>
 
-      {/* CTA */}
+      {/* Get Started*/}
       <motion.section
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
-        variants={fadeInUp}
         transition={{ duration: 0.8 }}
         className="py-20 px-6 text-center"
       >
-        <h2 className="text-3xl font-bold mb-6">
+        <motion.h2
+          initial={{ y: -20, opacity: 0 }}
+          whileInView={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+          className="text-3xl font-bold mb-6"
+        >
           Ready to check your weather?
-        </h2>
+        </motion.h2>
+
+        {/* Get Started Button */}
         <Link to="/home">
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -346,21 +350,10 @@ const LandingPage = () => {
         <p className="text-sm">© 2025 ClimaMate. Plan your day smarter.</p>
       </footer>
 
-      {/* Animations */}
+      {/* Animation  Styles*/}
       <style jsx="true">{`
         html {
           scroll-behavior: smooth;
-        }
-        @keyframes spinSlow {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
-        }
-        .animate-spin-slow {
-          animation: spinSlow 10s linear infinite;
         }
         @keyframes pulseSlow {
           0%,
