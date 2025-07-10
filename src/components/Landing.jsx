@@ -144,7 +144,7 @@ const LandingPage = () => {
           Live weather updates, daily suggestions, and trivia to brighten your
           day.
         </motion.p>
-        <Link to="/home">
+        <Link to="/homepage">
           <motion.button
             initial={{ y: 30, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
