@@ -33,7 +33,7 @@ const LandingPage = () => {
   ];
 
   const apiKey = import.meta.env.VITE_WEATHER_API_KEY;
-  // fetcg weather
+  // fetch weather
   useEffect(() => {
     const fetchWeather = async () => {
       try {
@@ -48,7 +48,7 @@ const LandingPage = () => {
     fetchWeather();
   }, []);
 
-  //Sync greeting to weather
+  //time greeting
   useEffect(() => {
     const hour = new Date().getHours();
     let timeGreeting = "";
@@ -77,6 +77,7 @@ const LandingPage = () => {
   }, []);
 
   const condition = weather?.weather[0].main;
+  console.log(condition)
   const theme = weatherThemes[condition] || weatherThemes["default"];
   const weatherIconUrl = weather
     ? `https://openweathermap.org/img/wn/${weather.weather[0].icon}@4x.png`
@@ -96,7 +97,7 @@ const LandingPage = () => {
           ClimaMate
         </h1>
         <nav className="flex gap-4">
-          {["#top", "#features", "#testimonials"].map((link, i) => (
+          {["#Home", "#features", "#testimonials"].map((link, i) => (
             <a key={i} href={link}>
               <button className="text-white px-4 py-2 rounded-full hover:bg-white/20 transition">
                 {link.replace("#", "").charAt(0).toUpperCase() + link.slice(2)}
@@ -118,7 +119,7 @@ const LandingPage = () => {
         whileInView={{ scale: 1 }}
         variants={fadeInUp}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="flex flex-col items-center justify-center px-4 py-20 text-center space-y-6 pt-20 scroll-mt-8 "
+        className="flex flex-col items-center justify-center px-4 py-30 text-center space-y-6  scroll-mt-10 "
       >
         <p className="text-xl sm:text-2xl font-semibold">{greeting}</p>
         {weather && (

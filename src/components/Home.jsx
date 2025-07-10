@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { Sun, CloudRain, Cloud, Wind, Loader2 } from "lucide-react";
+import { Sun, Moon, CloudRain, Cloud, Wind } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ClipLoader } from "react-spinners";
 
 const getSuggestion = (temp, desc) => {
   if (!temp || !desc) return "";
@@ -12,10 +14,21 @@ const getSuggestion = (temp, desc) => {
   return "Weather looks great for your day! 😊";
 };
 
+const getGreeting = () => {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 18) return "Good afternoon";
+  return "Good evening";
+};
+
 const Home = () => {
   const [city, setCity] = useState("");
   const [weather, setWeather] = useState(null);
+  const [currentWeather, setCurrentWeather] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+  const [triviaIndex, setTriviaIndex] = useState(0);
+  const [forecast, setForecast] = useState(null);
 
   const weatherFacts = [
     "Raindrops can fall at speeds of about 22 mph.",
@@ -23,6 +36,37 @@ const Home = () => {
     "The coldest temperature recorded was -89.2°C in Antarctica.",
     "Snowflakes can take up to an hour to reach the ground.",
   ];
+
+  const apiKey = import.meta.env.VITE_WEATHER_API_KEY;
+
+  useEffect(() => {
+    const fetchCurrentWeather = async () => {
+      try {
+        const res = await axios.get(
+          `https://api.openweathermap.org/data/2.5/weather?q=Lagos&appid=${apiKey}&units=metric`
+        );
+        setCurrentWeather(res.data);
+
+        const forecastRes = await axios.get(
+          `https://api.openweathermap.org/data/2.5/forecast`,
+          {
+            params: { q: res.data.name, appid: apiKey, units: "metric" },
+          }
+        );
+        setForecast(forecastRes.data);
+      } catch (err) {
+        console.error("Error fetching weather:", err);
+      }
+    };
+    fetchCurrentWeather();
+  }, [apiKey]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTriviaIndex((prev) => (prev + 1) % weatherFacts.length);
+    }, 8000);
+    return () => clearInterval(interval);
+  }, []);
 
   const fetchWeather = async (e) => {
     e.preventDefault();
@@ -33,15 +77,10 @@ const Home = () => {
 
     setLoading(true);
     try {
-      const apiKey = import.meta.env.VITE_WEATHER_API_KEY;
       const res = await axios.get(
         `https://api.openweathermap.org/data/2.5/weather`,
         {
-          params: {
-            q: city,
-            appid: apiKey,
-            units: "metric",
-          },
+          params: { q: city, appid: apiKey, units: "metric" },
         }
       );
       setWeather(res.data);
@@ -49,7 +88,6 @@ const Home = () => {
     } catch (error) {
       console.error("Error fetching weather:", error);
       if (error.response?.status === 404) toast.error("City not found");
-      else if (error.response?.status === 401) toast.error("Invalid API key");
       else toast.error("Error fetching weather");
     } finally {
       setLoading(false);
@@ -66,111 +104,213 @@ const Home = () => {
     return <Wind size={48} className="text-gray-400" />;
   };
 
+  const getEventSuggestion = (temp, desc) => {
+    if (!temp || !desc) return "No suggestion";
+    if (desc.includes("rain")) return "Consider indoor activities today.";
+    if (temp > 30) return "Great for outdoor sports or errands.";
+    if (temp < 15) return "Stay warm, maybe visit a cafe or read indoors.";
+    return "Perfect day for any plans you have!";
+  };
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-400 via-cyan-300 to-teal-400 px-4 py-8">
+    <div
+      className={`${
+        darkMode
+          ? "bg-gray-900 text-white"
+          : "bg-gradient-to-br from-blue-400 via-cyan-300 to-teal-400 text-gray-900"
+      } min-h-screen flex flex-col relative`}
+    >
       {/* Header */}
-      <header className="w-full py-4 px-6 flex justify-between items-center bg-white/10 backdrop-blur-md sticky top-0 z-10 shadow-sm">
-        <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+      <header className="w-full py-4 px-6 flex justify-between items-center sticky top-0 z-10 bg-gradient-to-r from-blue-500 to-cyan-400/80 backdrop-blur-md shadow-sm">
+        <h1 className="text-2xl font-bold flex items-center gap-2">
           <Sun size={24} className="text-yellow-300 animate-spin-slow" /> ClimaMate
         </h1>
-        <nav className="flex gap-4">
+        <div className="flex gap-4">
+          <button onClick={() => setDarkMode(!darkMode)} aria-label="Toggle dark mode">
+            {darkMode ? <Sun size={24} /> : <Moon size={24} />}
+          </button>
           <Link to="/">
-            <button
-              className="text-white font-medium px-4 py-2 rounded-lg hover:bg-white/20 transition duration-300"
-              aria-label="Back to Landing Page"
-            >
+            <button className="font-medium px-4 py-2 rounded-lg hover:bg-white/20 transition duration-300" aria-label="Back to Landing Page">
               Home
             </button>
           </Link>
-        </nav>
+        </div>
       </header>
 
-      {/* Hero */}
-      <main className="w-full max-w-lg text-center mt-10">
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-6 drop-shadow-lg">
+      <main className="w-full max-w-5xl mx-auto px-4 py-10 text-center">
+        <motion.h2
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="text-3xl sm:text-4xl font-extrabold mb-2"
+        >
           Check your weather instantly
-        </h2>
+        </motion.h2>
+        <p className="text-lg mb-6">{getGreeting()}, welcome to ClimaMate 👋</p>
 
-        {/* Form */}
-        <form onSubmit={fetchWeather} className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-          <input
-            type="text"
-            placeholder="Enter city name"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            className="flex-1 px-4 py-3 rounded-lg bg-white/80 backdrop-blur-md border border-gray-200 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-            aria-label="City name input"
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-yellow-400 text-gray-800 font-semibold px-6 py-3 rounded-lg hover:bg-yellow-500 disabled:opacity-50 transition flex items-center justify-center"
-            aria-label="Search weather"
-          >
-            {loading ? <Loader2 size={24} className="animate-spin" /> : "Search"}
-          </button>
-        </form>
+        <section className="flex flex-col lg:flex-row w-full gap-6 justify-center items-start">
+          {/* Current Weather Card */}
+          {currentWeather && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6 }}
+              className="bg-white/90 backdrop-blur-md rounded-xl shadow-xl p-6 w-full lg:w-2/3 flex-1"
+            >
+              <h3 className="text-xl font-bold mb-4">
+                Current Weather ({currentWeather.name})
+              </h3>
+              <div className="flex justify-center mb-4">
+                {getWeatherIcon(currentWeather.weather[0].main)}
+              </div>
+              <h3 className="text-2xl font-semibold mb-2">
+                {currentWeather.name}, {currentWeather.sys.country}
+              </h3>
+              <p className="text-5xl font-bold text-blue-600 mb-2">
+                {Math.round(currentWeather.main.temp)}°C
+              </p>
+              <p className="text-lg capitalize mb-4">
+                {currentWeather.weather[0].description}
+              </p>
+              <p className="text-sm mb-2">
+                💡 {getSuggestion(currentWeather.main.temp, currentWeather.weather[0].description)}
+              </p>
+              <div className="flex justify-around text-sm mb-4">
+                <p>Humidity: {currentWeather.main.humidity}%</p>
+                <p>Wind: {currentWeather.wind.speed} m/s</p>
+              </div>
 
-        {/* Weather Card */}
-        {weather && (
-          <div className="bg-white/90 backdrop-blur-md rounded-xl shadow-xl p-6 mb-6 animate-fadeIn">
-            <div className="flex justify-center mb-4">
-              {getWeatherIcon(weather.weather[0].main)}
-            </div>
-            <h3 className="text-2xl font-semibold text-gray-800 mb-2">
-              {weather.name}, {weather.sys.country}
-            </h3>
-            <p className="text-5xl font-bold text-blue-600 mb-2">
-              {Math.round(weather.main.temp)}°C
-            </p>
-            <p className="text-lg capitalize text-gray-600 mb-4">
-              {weather.weather[0].description}
-            </p>
-            <p className="text-sm text-gray-700 mb-2">
-              💡 {getSuggestion(weather.main.temp, weather.weather[0].description)}
-            </p>
-            <div className="flex justify-around text-sm text-gray-500">
-              <p>Humidity: {weather.main.humidity}%</p>
-              <p>Wind: {weather.wind.speed} m/s</p>
-            </div>
+              {/* Forecast */}
+              {forecast && (
+                <div className="mt-6">
+                  <h3 className="text-lg font-bold mb-2">
+                    Upcoming Forecast & Event Suggestions
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[400px] overflow-y-auto">
+                    {forecast.list.slice(0, 8).map((item, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.2 * i }}
+                        className="bg-gradient-to-br from-white/70 to-white/50 rounded-lg p-4 shadow hover:scale-105 transition-transform"
+                      >
+                        <p className="text-sm text-gray-600">
+                          {new Date(item.dt_txt).toLocaleString()}
+                        </p>
+                        <div className="flex items-center gap-2 my-2">
+                          {getWeatherIcon(item.weather[0].main)}
+                          <p
+                            className={`text-lg font-semibold ${
+                              item.main.temp > 30
+                                ? "text-red-500"
+                                : item.main.temp < 15
+                                ? "text-blue-500"
+                                : "text-green-600"
+                            }`}
+                          >
+                            {Math.round(item.main.temp)}°C
+                          </p>
+                        </div>
+                        <p className="capitalize text-gray-700">{item.weather[0].description}</p>
+                        <p className="text-xs mt-2">
+                          💡 {getEventSuggestion(item.main.temp, item.weather[0].description)}
+                        </p>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          )}
+
+          <div className="flex-1">
+            {/* Search Form */}
+            <form onSubmit={fetchWeather} className="flex flex-col sm:flex-row gap-4 w-full">
+              <input
+                type="text"
+                placeholder="Enter city name e.g. Lagos"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                aria-label="City name input"
+              />
+              <button
+                type="submit"
+                disabled={loading}
+                className="bg-yellow-400 text-gray-800 font-semibold px-6 py-3 rounded-lg hover:bg-yellow-500 disabled:opacity-50 transition flex items-center justify-center gap-2"
+                aria-label="Search weather"
+              >
+                {loading && <ClipLoader size={20} color="#333" />}
+                <span>{loading ? "Searching..." : "Search"}</span>
+              </button>
+            </form>
+
+            {/* Searched Weather Card */}
+            {weather && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6 }}
+                className="bg-white/90 backdrop-blur-md rounded-xl shadow-xl p-6 w-full mt-4"
+              >
+                <h3 className="text-xl font-bold mb-4">Searched Weather</h3>
+                <div className="flex justify-center mb-4">
+                  {getWeatherIcon(weather.weather[0].main)}
+                </div>
+                <h3 className="text-2xl font-semibold mb-2">
+                  {weather.name}, {weather.sys.country}
+                </h3>
+                <p className="text-5xl font-bold text-blue-600 mb-2">
+                  {Math.round(weather.main.temp)}°C
+                </p>
+                <p className="text-lg capitalize mb-4">{weather.weather[0].description}</p>
+                <p className="text-sm mb-2">
+                  💡 {getSuggestion(weather.main.temp, weather.weather[0].description)}
+                </p>
+                <div className="flex justify-around text-sm">
+                  <p>Humidity: {weather.main.humidity}%</p>
+                  <p>Wind: {weather.wind.speed} m/s</p>
+                </div>
+              </motion.div>
+            )}
           </div>
-        )}
-
-        {/* Trivia */}
-        <div className="bg-white/30 backdrop-blur-lg rounded-xl px-6 py-4 max-w-md mx-auto shadow-lg animate-slideIn mt-6">
-          <h3 className="text-lg font-semibold mb-2 flex items-center gap-2 text-white">
-            <Wind size={20} className="text-yellow-300" /> Weather Trivia
-          </h3>
-          <p className="text-sm text-white/80">
-            {weatherFacts[Math.floor(Math.random() * weatherFacts.length)]}
-          </p>
-        </div>
+        </section>
       </main>
 
-      {/* Footer */}
       <footer className="w-full py-4 px-6 text-center bg-white/10 backdrop-blur-md mt-auto z-10">
-        <p className="text-sm text-white">© 2025 ClimaMate. All rights reserved.</p>
+        <p className="text-sm">© 2025 ClimaMate. All rights reserved.</p>
       </footer>
 
-      {/* Animations */}
+      {/* Trivia */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={triviaIndex}
+          initial={{ opacity: 0, x: 50, y: -20 }}
+          animate={{ opacity: 1, x: 0, y: 0 }}
+          exit={{ opacity: 0, x: 50, y: -20 }}
+          transition={{ duration: 0.8 }}
+          className="fixed top-24 right-4 bg-white/30 backdrop-blur-lg rounded-xl px-4 py-3 shadow-lg w-64 max-w-xs sm:max-w-sm"
+        >
+          <h3 className="text-md font-semibold mb-2 flex items-center gap-2">
+            <Wind size={16} className="text-yellow-300" /> Weather Facts
+          </h3>
+          <p className="text-sm">{weatherFacts[triviaIndex]}</p>
+        </motion.div>
+      </AnimatePresence>
+
       <style jsx="true">{`
         @keyframes spinSlow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
         }
-        .animate-spin-slow { animation: spinSlow 10s linear infinite; }
-
-        @keyframes fadeIn {
-          from { opacity: 0; transform: scale(0.95); }
-          to { opacity: 1; transform: scale(1); }
+        .animate-spin-slow {
+          animation: spinSlow 10s linear infinite;
         }
-        .animate-fadeIn { animation: fadeIn 0.8s ease-out forwards; }
-
-        @keyframes slideIn {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-slideIn { animation: slideIn 0.8s ease-out forwards; }
       `}</style>
     </div>
   );
